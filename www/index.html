@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="fonts/fa/css/font-awesome.min.css" />
+    <title>Baza leków</title>
+</head>
+<body>
+
+<a href="javascript:void(0)" class="menu-trigger">
+    <i class="fa fa-fw fa-bars"></i>
+</a>
+
+<div class="menu">
+    <a href="javascript:void(0)" class="load" data-list="medicine"><i class="fa fa-fw fa-flask"></i> Leki</a>
+    <a href="javascript:void(0)" class="load" data-list="categories"><i class="fa fa-fw fa-folder-o"></i> Kategorie</a>
+    <a href="javascript:void(0)" class="load" data-list="substances"><i class="fa fa-fw fa-flask"></i> Substancje</a>
+    <a href="javascript:void(0)" class="load" data-list="forms"><i class="fa fa-fw fa-medkit"></i> Formy leków</a>
+    <a href="javascript:void(0)" class="load" data-list="specializations"><i class="fa fa-fw fa-stethoscope"></i> Specjalizacje</a>
+    <a href="javascript:void(0)" class="load" data-list="treatments"><i class="fa fa-fw fa-heartbeat"></i> Sposoby leczenia</a>
+    <a href="javascript:void(0)" class="settings"><i class="fa fa-fw fa-cog"></i> Ustawienia</a>
+    <a href="javascript:void(0)" class="close"><i class="fa fa-fw fa-times"></i> Zamknij</a>
+</div>
+
+<form class="search">
+    <input type="text" class="finder" placeholder="Znajdź" />
+    <span class="search-addon">
+        <i class="fa fa-fw fa-search"></i>
+    </span>
+</form>
+
+<div class="top-bar"></div>
+
+<div class="list">
+    <div class="content"></div>
+    <div class="loader">
+        <i class="fa fa-fw fa-spin fa-circle-o-notch"></i>
+    </div>
+</div>
+
+
+<div class="templates">
+    <div class="drug">
+        <div class="list-item" data-id="{{id}}" data-type="{{type}}">
+            <div class="list-item__title">{{name}}</div>
+            <div class="list-item__forms">{{forms}}</div>
+            <div class="list-item__date">{{last_modify}}</div>
+            <div class="list-item__icons">
+                <i class="fa fa-fw fa-eye"></i>{{views}}
+                <i class="fa fa-fw fa-flask"></i>{{count_substances}}
+                <i class="fa fa-fw fa-medkit"></i>{{count_forms}}
+                <i class="fa fa-fw fa-stethoscope"></i>{{count_specializations}}
+                <i class="fa fa-fw fa-heartbeat"></i>{{count_treatments}}
+            </div>
+        </div>        
+    </div>
+</div>
+
+<div class="settings-container">
+    <div class="settings-inner">
+        <label for="search_mode" class="block">Tryb działania wyszukiwarki</label>
+        <select name="search_mode" id="search_mode">
+            <option selected value="name_like">Zawiera ciąg znaków</option>
+            <option value="name_starts_with">Zaczyna sie od ciągu znaków</option>
+            <option value="name_ends_with">Kończy się na ciag znaków</option>
+            <option value="name_multi_like">Strzępki słów</option>
+            <option value="name_reg">Wyrażenia regularne</option>
+            <option value="lev">Odległość Levenshteina</option>
+        </select>
+
+        <div class="search_info">
+            <i class="fa fa-info"></i>
+            <div class="info-item" data-info="name_like">
+                Wyszukuje listę elementów zawierających w nazwie podany ciąg znaków
+            </div>
+            <div class="info-item" style="display: none" data-info="name_starts_with">
+                Wyszukuje listę elementów, których nazwa zaczyna sie od podanego ciągu znaków
+            </div>
+            <div class="info-item" style="display: none" data-info="name_ends_with">
+                Wysztkuje liste elementów, których nazwa kończy sie na podany ciąg znaków
+            </div>
+            <div class="info-item" style="display: none" data-info="name_multi_like">
+                Wyszukuje listę elementów bazując na wpisanych częściach słów. Np: "apa dir" na liście leków zwróci lek apap direct
+            </div>
+            <div class="info-item" style="display: none" data-info="name_reg">
+                Wyszukuje listę elementów bazując na wprowadzonym wyrażeniu regularnym. Np: [a-zA-Z]{18}
+            </div>
+            <div class="info-item" style="display: none" data-info="lev">
+                Wyszukuję listę elementów bazując na podanej poniżej odległości levenshteina. Może być przydatne, gdy nie jesteśmy pewni, czy nie popełniliśmy literówki w nazwie leku. Np odległość levenshteina między wyrażeniem: "apap" i "apar" wynosi 1. Odległość levenshteina między słowami: "apap" i "apapa" również wynosi 1
+            </div>
+        </div>
+
+        <div class="lev" style="display: none">
+            <label class="block">Maksymalna odległość levenshteina</label>
+            <input type="number" name="lev_less" value="5" />
+        </div>
+
+        <div class="text-right">
+            <span class="btn btn-settings-close">
+                <i class="fa fa-fw fa-times"></i> Zamknij
+            </span>
+        </div>
+    </div>
+</div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/zepto.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+
+</html>

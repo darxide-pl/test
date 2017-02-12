@@ -1,0 +1,275 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+@font-face {
+    font-family: light;
+    src: url(../fonts/Roboto-Light.ttf);
+}
+
+@font-face {
+    font-family: regular;
+    src: url(../fonts/Roboto-Regular.ttf);
+}
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+    box-sizing: border-box;
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color:#E4E4E4;
+    background-attachment:fixed;
+    font-family:light,'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+    font-size:12px;
+    height:100%;
+    margin:0px;
+    padding:0px;
+    width:100%;
+    color: #2f2f2f;
+}
+
+/* Portrait layout (default) */
+.app {
+    background:url(../img/logo.png) no-repeat center top; /* 170px x 200px */
+    position:absolute;             /* position in the center of the screen */
+    left:50%;
+    top:50%;
+    height:50px;                   /* text area height */
+    width:225px;                   /* text area width */
+    text-align:center;
+    padding:180px 0px 0px 0px;     /* image height is 200px (bottom 20px are overlapped with text) */
+    margin:-115px 0px 0px -112px;  /* offset vertical: half of image height and text area height */
+                                   /* offset horizontal: half of text area width */
+}
+
+.search {
+    position: fixed;
+    width: 100%;
+    top: 45%;
+    left: 0px;
+    padding: 0 54px;
+    z-index: 3;
+    transition: top .3s ease-in;
+}
+
+.search.up {
+    top:1%;
+}
+
+input.finder {
+    display: block;
+    width: calc(100% - 39px);
+    height: 40px;
+    border: 1px solid #ccc;
+    padding: 0 12px;
+}
+
+.search-addon {
+    float: right;
+    margin-top: -40px;
+    font-size: 22px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    width: 40px;
+    text-align: center;
+    height: 40px;
+    padding-top: 4px;
+    margin-left: -1px;
+}
+
+.search-addon:active {
+    background-color: #f8f8f8;
+}
+
+input.finder {
+    display: block;
+    width: calc(100% - 39px);
+    height: 40px;
+    border: 1px solid #ccc;
+}
+
+.alert{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: #232322;
+    color: #fff;
+    width: 100%;
+    font-size: 18px;
+    padding: 20px;
+    box-shadow: 0 -2px 14px rgba(0,0,0,0.4); 
+    text-transform: uppercase;   
+}
+
+.menu {
+    position: fixed;
+    left: -300px;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #fff;
+    z-index: 20;
+    box-shadow: 3px 0px 12px rgba(0,0,0,0.2);
+    transition: 
+        left .3s ease-in,
+        opacity .3s ease-in;
+}
+
+.menu-trigger {
+    position: fixed;
+    left: 10px;
+    z-index: 13;
+    top: 1%;
+    color: #232323;
+    font-size: 26px;
+}
+
+.menu.open {
+    left: 0px;
+    opacity: 1;
+}
+
+.loader {
+    display: none;
+    text-align: center;
+    font-size: 20px;
+}
+
+.menu a {
+    display: block;
+    text-decoration: none;
+    color: #2f2f2f;
+    padding: 8px;
+    font-size: 15px;
+    font-family: regular;
+}
+
+.list {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+}
+
+.templates {
+    display: none;
+}
+
+.list-item {
+    width: 90%;
+    margin: 10px auto;
+    background: #fff;
+    padding: 10px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.list-item__title {
+    font-family: regular;
+    text-transform: uppercase;
+    font-size: 15px;
+}
+
+.top-bar {
+    z-index: 2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: #e4e4e4;    
+}
+
+.list-item__icons {
+    font-size: 16px;
+    font-family: regular;
+    padding-top: 8px;
+}
+
+.settings-container {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgb(228, 228, 228);
+    transition: left .3s ease-in;
+}
+
+.settings-container.open {
+    left: 0%;
+}
+
+.settings-inner {
+    width: 90%;
+    margin: 30px auto;
+    background-color: #fff;
+    padding: 20px;
+}
+
+.settings-inner label {
+    display: block;
+    font-family: regular;
+    font-size: 15px;
+    padding: 10px 0;
+}
+
+.search_info {
+    position: relative;  
+    padding: 20px 0;
+}
+
+.search_info .fa-info {
+    font-size: 21px;
+}
+
+.btn {
+    border: 1px solid #aaa;
+    padding: 5px 12px;
+}
+
+.btn:active {
+    background-color: #f8f8f8;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.block {
+    display: block;
+}
+
+/* Landscape layout (with min-width) */
+@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
+    .app {
+        background-position:left center;
+        padding:75px 0px 75px 170px;  /* padding-top + padding-bottom + text area = image height */
+        margin:-90px 0px 0px -198px;  /* offset vertical: half of image height */
+                                      /* offset horizontal: half of image width and text area width */
+    }
+}
