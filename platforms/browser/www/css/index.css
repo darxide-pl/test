@@ -139,7 +139,7 @@ input.finder {
     position: fixed;
     left: 10px;
     z-index: 13;
-    top: 1%;
+    top: 10px;
     color: #232323;
     font-size: 26px;
 }
@@ -190,6 +190,10 @@ input.finder {
     font-size: 15px;
 }
 
+.list-item__bottom {
+    margin-top: 11px;    
+}
+
 .drug-display .loader {
     position: absolute;
     width: 100%;
@@ -198,6 +202,7 @@ input.finder {
     font-size: 30px;
     opacity: 0;
     height: 0;
+    z-index: 1000;
     transition: opacity .3s ease-in;
 }
 
@@ -342,6 +347,12 @@ input.finder {
     z-index: 2;
     border-radius: 3px;
     white-space: nowrap;
+}
+
+.btn-drug-open {
+    float: right;
+    margin-top: -5px;
+    font-size: 13px;
 }
 
 /* Landscape layout (with min-width) */

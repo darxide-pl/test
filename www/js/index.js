@@ -33,6 +33,24 @@ var app = {
             by : 'name',
             dir : 'asc'
         },
+        filters : {
+            category_id : 0,
+            substance_id : 0,
+            form_id : 0,
+            specialization_id : 0,
+            treatment_id : 0,
+            tag_id : 0
+        },
+        filter : {
+            map : {
+                'categories' : 'category_id',
+                'substances' : 'substance_id',
+                'forms' : 'form_id',
+                'specializations' : 'specialization_id',
+                'treatments' : 'treatment_id',
+                'tags' : 'tag_id'
+            }
+        },
         lock : 0,
         end : 0
     },
@@ -50,6 +68,7 @@ var app = {
             app.events.list()
             app.events.settings()
             app.events.drugs()
+            app.events.filter()
         },
         search : function() {
             $(document).on('submit' , '.search' , function(e) {
@@ -75,6 +94,7 @@ var app = {
                 app.menu.open()
             })
             $(document).on('click', '.menu .load' , function() {
+                app.settings.finder.val("")
                 app.menu.close()
                 app.settings.list = $(this).data('list')
                 app.list.reset()
@@ -126,11 +146,20 @@ var app = {
             })
         },
         drugs : function() {
-            $(document).on('click' , '.drug-item' , function() {
+            $(document).on('click' , '.btn-drug-open' , function() {
                 app.drug($(this).data('id'))
             })
             $(document).on('click' , '.btn-drug-close' , function() {
                 app.loader.drug.hide()
+            })
+        },
+        filter : function() {
+            $(document).on('click' , '.btn-list-filter' , function() {
+                app.settings.finder.val("")
+                app.list.reset()
+                app.helper.filter.set($(this).data('type'), $(this).data('id'))
+                app.settings.list = 'medicine'
+                app.fetch()
             })
         }
     },
@@ -187,6 +216,17 @@ var app = {
 
                     $('.list .content').append(item)
                 }
+            } else {
+                for(var k in app.data.list) {
+                    row = app.data.list[k]
+                    item = app.template.list.item()
+                    item = item.replace('{{type}}' , app.settings.list)
+                    item = item.replace('{{id}}' , row.id) 
+                    item = item.replace('{{name}}' , row.name)
+                    item = item.replace('{{drug_count}}' , row.count_drugs)
+
+                    $('.list .content').append(item)
+                }   
             }
         },
         end : function() {
@@ -201,10 +241,16 @@ var app = {
 
     },
 
+    /**
+     *  fetch templates from hidden part of view
+     */
     template : {
         list : {
             drug : function() {
                 return $('.templates .drug').html()
+            },
+            item : function() {
+                return $('.templates .item').html()
             }
         }
     },
@@ -331,6 +377,10 @@ var app = {
                 app.loader.drug.hide()
                 app.message.fail('nie znaleziono danych o tym leku')
             } else {
+
+                var counter = $('.btn-drug-open[data-id="'+id+'"]').closest('.drug-item').find('.views-count')
+                counter.text(parseInt(counter.text()) + 1)
+
                 $('.drug__name').text(response.list[0].name)
                 $('.drug__info').html(
                     'ostatnia aktualizacja: '+response.list[0].last_modify+
@@ -348,11 +398,11 @@ var app = {
                 }
 
                 if(response.list[0].substances.length > 0) {
-                    var str = ''
+                    var str = []
                     for(var k in response.list[0].substances) {
-                        str += response.list[0].substances[k].name+' '
+                        str.push(response.list[0].substances[k].name)
                     }
-                    $('.drug__substances').text(str)
+                    $('.drug__substances').html(str.join('<br>'))
                 } else {
                     $('.drug__substances').text('brak danych')
                 }
@@ -401,7 +451,7 @@ var app = {
                         str += '<div class="block__title">'
                         str +=  response.list[0].description[k].title
                         str +=  '</div><div>'
-                        str +=  app.helper.nl2br(response.list[0].description[k].content)
+                        str +=  app.helper.multi_nl2br(response.list[0].description[k].content)
                         str +=  '</div>'
                     }
                     $('.drug__description').html(str)
@@ -447,6 +497,14 @@ var app = {
             params.push('contains_categories/1')
             params.push('contains_forms/1')
 
+            for(var k in app.settings.filters) {
+                if(app.settings.filters[k] > 0) {
+                    params.push(k+'/'+app.settings.filters[k])
+                }
+            }
+
+            console.log(params)
+
             return '/'+params.join('/')
         }
 
@@ -462,6 +520,21 @@ var app = {
         nl2br : function(str, is_xhtml) {   
             var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';    
             return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
-        }        
+        },
+        multi_nl2br : function(str, is_xhtml) {
+            var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br /><br />' : '<br><br>';    
+            return (str + '').replace(/(\r\n|\r|\n)+/g , breakTag)
+        },
+        filter : {
+            set : function(type, val) {
+                console.log(app.settings.filter.map[type] , type, val)
+                if(typeof app.settings.filter.map[type] !== 'undefined') {
+                    app.settings.filters[app.settings.filter.map[type]] = val
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }      
     }
 };

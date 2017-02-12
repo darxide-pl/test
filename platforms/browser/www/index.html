@@ -53,7 +53,7 @@
     <a href="javascript:void(0)" class="load" data-list="substances"><i class="fa fa-fw fa-flask"></i> Substancje</a>
     <a href="javascript:void(0)" class="load" data-list="forms"><i class="fa fa-fw fa-medkit"></i> Formy leków</a>
     <a href="javascript:void(0)" class="load" data-list="specializations"><i class="fa fa-fw fa-stethoscope"></i> Specjalizacje</a>
-    <a href="javascript:void(0)" class="load" data-list="treatments"><i class="fa fa-fw fa-heartbeat"></i> Sposoby leczenia</a>
+    <a href="javascript:void(0)" class="load" data-list="treatments"><i class="fa fa-fw fa-heartbeat"></i> Działania leków</a>
     <a href="javascript:void(0)" class="settings"><i class="fa fa-fw fa-cog"></i> Ustawienia</a>
     <a href="javascript:void(0)" class="close"><i class="fa fa-fw fa-times"></i> Zamknij</a>
 </div>
@@ -109,7 +109,7 @@
     </div>
     <div class="drug__block">
         <i class="fa fa-fw fa-heartbeat bg-icon"></i>
-        <div class="block__title">Sposoby leczenia:</div>
+        <div class="block__title">Działanie:</div>
         <div class="drug__treatments"></div>
     </div>
     <div class="drug__block">
@@ -126,18 +126,28 @@
 
 <div class="templates">
     <div class="drug">
-        <div class="list-item drug-item" data-id="{{id}}" data-type="{{type}}">
+        <div class="list-item drug-item" data-type="{{type}}">
             <div class="list-item__title">{{name}}</div>
             <div class="list-item__forms">{{forms}}</div>
             <div class="list-item__date">{{last_modify}}</div>
             <div class="list-item__icons">
-                <i class="fa fa-fw fa-eye"></i>{{views}}
+                <i class="fa fa-fw fa-eye"></i><span class="views-count">{{views}}</span>
                 <i class="fa fa-fw fa-flask"></i>{{count_substances}}
                 <i class="fa fa-fw fa-medkit"></i>{{count_forms}}
                 <i class="fa fa-fw fa-stethoscope"></i>{{count_specializations}}
                 <i class="fa fa-fw fa-heartbeat"></i>{{count_treatments}}
+                <span class="btn btn-drug-open" data-id="{{id}}"><i class="fa fa-fw fa-info"></i> szczegóły</span>
             </div>
         </div>        
+    </div>
+    <div class="item">
+        <div class="list-item main-item">
+            <div class="list-item__title">{{name}}</div>
+            <div>leki: {{drug_count}}</div>
+            <div class="list-item__bottom">
+                <span class="btn btn-list-filter" data-type="{{type}}" data-id="{{id}}"><i class="fa fa-fw fa-info"></i> pokaż leki</span>
+            </div>
+        </div>
     </div>
 </div>
 
