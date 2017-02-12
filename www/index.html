@@ -74,10 +74,59 @@
     </div>
 </div>
 
+<div class="drug-display">
+    <div class="loader">
+        <div class="centrify">
+            <i class="fa fa-fw fa-circle-o-notch fa-spin"></i>
+        </div>
+    </div>
+    <div class="text-right" style="width: 90%;margin: 20px auto;">
+        <span class="btn btn-drug-close"><i class="fa fa-fw fa-times"></i> zamknij</span>
+    </div>
+    <div class="drug__block">
+        <div class="drug__name"></div>
+        <div class="drug__info"></div>        
+    </div>
+    <div class="drug__block">
+        <i class="fa fa-fw fa-folder-o bg-icon"></i>
+        <div class="block__title">Kategorie:</div>
+        <div class="drug__categories"></div>
+    </div>
+    <div class="drug__block">
+        <i class="fa fa-fw fa-flask bg-icon"></i>
+        <div class="block__title">Substancje:</div>
+        <div class="drug__substances"></div>
+    </div>   
+    <div class="drug__block">
+        <i class="fa fa-fw fa-medkit bg-icon"></i>
+        <div class="block__title">Formy leku:</div>
+        <div class="drug__forms"></div>
+    </div>       
+    <div class="drug__block">
+        <i class="fa fa-fw fa-stethoscope bg-icon"></i>
+        <div class="block__title">Specjalizacje:</div>
+        <div class="drug__specializations"></div>
+    </div>
+    <div class="drug__block">
+        <i class="fa fa-fw fa-heartbeat bg-icon"></i>
+        <div class="block__title">Sposoby leczenia:</div>
+        <div class="drug__treatments"></div>
+    </div>
+    <div class="drug__block">
+        <i class="fa fa-fw fa-tag bg-icon"></i>
+        <div class="block__title">Tagi:</div>
+        <div class="drug__tags"></div>
+    </div>    
+    <div class="drug__block drug__descr" style="display: none">
+        <i class="fa fa-fw fa-pencil bg-icon"></i>
+        <div class="drug__description"></div>
+    </div>        
+</div>
+
 
 <div class="templates">
     <div class="drug">
-        <div class="list-item" data-id="{{id}}" data-type="{{type}}">
+        <div class="list-item drug-item" data-id="{{id}}" data-type="{{type}}">
             <div class="list-item__title">{{name}}</div>
             <div class="list-item__forms">{{forms}}</div>
             <div class="list-item__date">{{last_modify}}</div>

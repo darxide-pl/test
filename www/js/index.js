@@ -49,6 +49,7 @@ var app = {
             app.events.menu()
             app.events.list()
             app.events.settings()
+            app.events.drugs()
         },
         search : function() {
             $(document).on('submit' , '.search' , function(e) {
@@ -116,11 +117,20 @@ var app = {
                     $('.lev').slideDown(240)
                 } else {
                     $('.lev').slideUp(240)
+                    app.message.succes('zmiany zapisano')
                 }
-
             })
             $(document).on('change' , '.lev input' , function() {
                 app.settings.search.levenshtein = $(this).val()
+                app.message.succes('zmiany zapisano')
+            })
+        },
+        drugs : function() {
+            $(document).on('click' , '.drug-item' , function() {
+                app.drug($(this).data('id'))
+            })
+            $(document).on('click' , '.btn-drug-close' , function() {
+                app.loader.drug.hide()
             })
         }
     },
@@ -135,7 +145,6 @@ var app = {
         close : function() {
             app.settings.menu.removeClass('open')
         }
-
     },
 
     /**
@@ -223,6 +232,20 @@ var app = {
             off : function() {
                 $('.list .loader').fadeOut(240)
             }            
+        },
+        drug : {
+            show : function() {
+                $('.drug-display').addClass('open')
+            },
+            hide : function() {
+                $('.drug-display').removeClass('open')
+            },
+            loaded : function() {
+                $('.drug-display .loader').removeClass('open')
+            },
+            load : function() {
+                $('.drug-display .loader').addClass('open')
+            }
         }
     },
 
@@ -249,7 +272,7 @@ var app = {
                 $(selector).fadeOut(300 , function() {
                     $(this).remove()
                 })
-            }, 1500)
+            }, 2500)
         }
     },
 
@@ -289,13 +312,111 @@ var app = {
                 }
             }
 
-
         }).fail(function() {
             app.loader.list.off()
             app.settings.lock = 0
             app.message.fail('błąd serwera')
         })
     },
+
+    drug : function(id) {
+        app.loader.drug.show()
+        app.loader.drug.load()
+        $.post(app.settings.api+'drug/id/'+id)
+        .done(function(data) {
+            var response = JSON.parse(data)
+            app.loader.drug.loaded()
+
+            if(response.status == 0) {
+                app.loader.drug.hide()
+                app.message.fail('nie znaleziono danych o tym leku')
+            } else {
+                $('.drug__name').text(response.list[0].name)
+                $('.drug__info').html(
+                    'ostatnia aktualizacja: '+response.list[0].last_modify+
+                    '<br>wyświetleń: '+response.list[0].views)
+
+                if(response.list[0].categories.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].categories) {
+                        str += response.list[0].categories[k].name+' '
+                    }
+
+                    $('.drug__categories').text(str)
+                } else {
+                    $('.drug__categories').text('brak danych')
+                }
+
+                if(response.list[0].substances.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].substances) {
+                        str += response.list[0].substances[k].name+' '
+                    }
+                    $('.drug__substances').text(str)
+                } else {
+                    $('.drug__substances').text('brak danych')
+                }
+
+                if(response.list[0].forms.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].forms) {
+                        str += response.list[0].forms[k].name+' '
+                    }
+                    $('.drug__forms').text(str)
+                } else {
+                    $('.drug__forms').text('brak danych')
+                }
+
+                if(response.list[0].specializations.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].specializations) {
+                        str += response.list[0].specializations[k].name+' '
+                    }
+                    $('.drug__specializations').text(str)
+                } else {
+                    $('.drug__specializations').text('brak danych')
+                }
+
+                if(response.list[0].treatments.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].treatments) {
+                        str += response.list[0].treatments[k].name+' '
+                    }
+                    $('.drug__treatments').text(str)
+                } else {
+                    $('.drug__treatments').text('brak danych')
+                }
+
+                if(response.list[0].tags.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].tags) {
+                        str += '<span class="drug__tag">'+response.list[0].tags[k].name+'</span>'
+                    }
+                    $('.drug__tags').html(str)
+                }
+
+                if(response.list[0].description.length > 0) {
+                    var str = ''
+                    for(var k in response.list[0].description) {
+                        str += '<div class="block__title">'
+                        str +=  response.list[0].description[k].title
+                        str +=  '</div><div>'
+                        str +=  app.helper.nl2br(response.list[0].description[k].content)
+                        str +=  '</div>'
+                    }
+                    $('.drug__description').html(str)
+                    $('.drug__descr').show()
+                } else {
+                    $('.drug__descr').hide()
+                }
+
+            }
+
+        }).fail(function() {
+            app.loader.drug.loaded()
+            app.message.fail('błąd serwera')
+        })
+    },    
 
     /**
      *  parsing links, lists ona other parsing stuff
@@ -337,6 +458,10 @@ var app = {
     helper : {
         uniq : function() {
             return Math.round(Math.random()*1000000)
-        }
+        },
+        nl2br : function(str, is_xhtml) {   
+            var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';    
+            return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+        }        
     }
 };
