@@ -17,7 +17,7 @@ var app = {
      *  setting  
      */
     settings : {
-        api : 'http://www.leki.dariuszm.pl/drugs/api/',
+        api : 'http://www.leki.dariuszm.pl/api/',
         finder : $('.finder'),
         menu : $('.menu'),
         list : 'medicine',
@@ -49,6 +49,14 @@ var app = {
                 'specializations' : 'specialization_id',
                 'treatments' : 'treatment_id',
                 'tags' : 'tag_id'
+            },
+            names : {
+                'categories' : 'kategoria',
+                'substances' : 'substancja',
+                'forms' : 'postać',
+                'specializations' : 'specjalizacja',
+                'treatments' : 'działanie',
+                'tags' : 'tag'
             }
         },
         lock : 0,
@@ -69,6 +77,7 @@ var app = {
             app.events.settings()
             app.events.drugs()
             app.events.filter()
+            app.events.comments()
         },
         search : function() {
             $(document).on('submit' , '.search' , function(e) {
@@ -157,9 +166,30 @@ var app = {
             $(document).on('click' , '.btn-list-filter' , function() {
                 app.settings.finder.val("")
                 app.list.reset()
-                app.helper.filter.set($(this).data('type'), $(this).data('id'))
+                if(app.helper.filter.set($(this).data('type'), $(this).data('id'))) {
+                    app.helper.filter.append($(this).closest('.list-item').find('.list-item__title').text(), $(this).data('type'))
+                }
                 app.settings.list = 'medicine'
                 app.fetch()
+                app.helper.filter.counter()
+            })
+            $(document).on('click' , '.btn-filter-remove' , function() {
+                app.helper.filter.unset($(this).data('type'))
+            })
+            $(document).on('click' , '.filter-trigger' , function() {
+                $('.list-filter').fadeToggle(240)
+            })
+        },
+        comments : function() {
+            $(document).on('click' , '.btn-comment' , function() {
+                app.comments($(this).data('id'))
+                app.loader.comments.show()
+            })
+            $(document).on('click' , '.btn-comment-close' , function() {
+                app.loader.comments.hide()
+            })
+            $(document).on('click' , '.btn-comment-send' , function() {
+                app.comment()
             })
         }
     },
@@ -228,6 +258,9 @@ var app = {
                     $('.list .content').append(item)
                 }   
             }
+
+            $('.all-content').fadeIn(240)
+            $('.all').text(app.data.all)
         },
         end : function() {
             $('.list .content').append( $('<div>')
@@ -252,6 +285,9 @@ var app = {
             item : function() {
                 return $('.templates .item').html()
             }
+        },
+        comment : function() {
+            return $('.templates .comment').html()
         }
     },
 
@@ -291,6 +327,14 @@ var app = {
             },
             load : function() {
                 $('.drug-display .loader').addClass('open')
+            }
+        },
+        comments : {
+            show : function() {
+                $('.comment-display').addClass('open')
+            },
+            hide : function() {
+                $('.comment-display').removeClass('open')
             }
         }
     },
@@ -347,6 +391,8 @@ var app = {
             } else {            
                 if(app.data.list.length == 0) {
                     app.message.succes('brak wyników wyszukiwania')
+                    $('.all-content').fadeIn(0)
+                    $('.all').text(app.data.all)                    
                 } else {
                     if(app.data.pages > app.settings.pages.current) {
                         app.list.build()
@@ -380,6 +426,9 @@ var app = {
 
                 var counter = $('.btn-drug-open[data-id="'+id+'"]').closest('.drug-item').find('.views-count')
                 counter.text(parseInt(counter.text()) + 1)
+
+                $('.btn-comment').data('id' , id)
+                $('.btn-comment-send').data('id' , id)
 
                 $('.drug__name').text(response.list[0].name)
                 $('.drug__info').html(
@@ -468,6 +517,60 @@ var app = {
         })
     },    
 
+    comments : function(id) {
+        $.post(app.settings.api+'/comments/id/'+id)
+        .done(function(data) {
+            var response = JSON.parse(data)
+
+            if(response.status == 0) {
+                app.message.fail('błąd serwera')
+            } else {
+                $('.comments').html("")
+                if(response.list.length > 0) {
+                    var row,
+                        item 
+                    for (var k in response.list) {
+                        row = response.list[k]
+                        item = app.template.comment()
+
+                        item = item.replace('{{nick}}' , row.name)
+                        item = item.replace('{{date}}' , row.add_date)
+                        item = item.replace('{{content}}' , row.comment)
+
+                        $('.comments').append(item)
+                    }
+                } else {
+                    $('.comments').append('<div class="text-center" style="padding:20px">brak komentarzy</div>')
+                }
+            }
+
+        }).fail(function() {
+            app.message.fail('błąd serwera')
+        })
+    },
+
+    comment : function() {
+        $.post(app.settings.api+'/comment/' , {
+            'drug_id' : $('.btn-comment-send').data('id'),
+            'name' : $('.comment-name').val(),
+            'comment' : $('.comment-area').val(),
+            'device_id' : device.uuid
+        }).done(function(data) {
+            var response = JSON.parse(data)
+
+            if(response.status == 0) {
+                app.message.fail(response.msg)
+            } else {
+                app.message.succes('komentarz został dodany')
+                $('.comment-name').val("")
+                $('.comment-area').val("")
+            }
+
+        }).fail(function() {
+            app.message.fail('błąd serwera')
+        })
+    },
+
     /**
      *  parsing links, lists ona other parsing stuff
      */
@@ -503,8 +606,6 @@ var app = {
                 }
             }
 
-            console.log(params)
-
             return '/'+params.join('/')
         }
 
@@ -527,14 +628,54 @@ var app = {
         },
         filter : {
             set : function(type, val) {
-                console.log(app.settings.filter.map[type] , type, val)
                 if(typeof app.settings.filter.map[type] !== 'undefined') {
                     app.settings.filters[app.settings.filter.map[type]] = val
                     return true
                 } else {
                     return false
                 }
-            }
-        }      
+            },
+            counter : function() {
+                i = 0
+                for (var k in app.settings.filters) {
+                    if(app.settings.filters[k] > 0) i++
+                }
+
+                if(i > 0) {
+                    $('.filter-trigger').fadeIn(200)
+                } else {
+                    $('.filter-trigger').fadeOut(200)
+                    $('.list-filter').fadeOut(200)
+                }
+
+                $('.filter-count').text(i)
+
+                return i
+            }, 
+            append : function(name, type) {
+                $('.filter-active[data-type="'+type+'"]').remove()
+
+                $('.list-filter').append(function() {
+                    var html = ''
+
+                    html += '<div class="filter-active" data-type="'+type+'">'
+                    html += app.settings.filter.names[type] +': '+ name 
+                    html += '<span class="btn btn-filter-remove" data-type="'+type+'">'
+                    html += '<i class="fa fa-fw fa-times"></i> Usuń filtr'
+                    html += '</span></div>'
+
+                    return html 
+                })
+            },
+            unset : function(type) {
+                $('.filter-active[data-type="'+type+'"]').fadeOut(240 , function() {
+                    $(this).remove()
+                })
+                app.settings.filters[app.settings.filter.map[type]] = 0
+                app.helper.filter.counter()
+                app.list.reset()
+                app.fetch()
+            }      
+        }, 
     }
 };

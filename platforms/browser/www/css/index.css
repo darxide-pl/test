@@ -175,7 +175,13 @@ input.finder {
     display: none;
 }
 
-.list-item {
+.comment__nick {
+    font-size: 15px;
+    font-family: regular;
+}
+
+.list-item,
+.comment-item {
     width: 90%;
     margin: 10px auto;
     background: #fff;
@@ -353,6 +359,86 @@ input.finder {
     float: right;
     margin-top: -5px;
     font-size: 13px;
+}
+
+.filter-trigger {
+    position: fixed;
+    right: 10px;
+    z-index: 13;
+    top: 10px;
+    color: #232323;
+    font-size: 26px;
+}
+
+.filter-count {
+    position: absolute;
+    top: -1px;
+    right: -5px;
+    font-size: 13px;
+    background-color: #F7A54A;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 9px;
+}
+
+.list-filter {
+    position: fixed;
+    top: 50px;
+    width: 100%;
+    background: rgba(255,255,255,1);
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0px 2px 3px rgba(0,0,0,0.2);
+}
+
+.list-filter .text-center {
+    font-size: 15px;
+    font-family: regular;
+    padding: 0 0 20px;    
+}
+
+.filter-active {
+    padding: 10px 0;
+}
+
+.btn-filter-remove {
+    float: right;
+    margin-top: -5px;
+}
+
+.comment-display {
+    position: fixed;
+    top: 0;
+    left: 100%;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: #e4e4e4;
+    transition: left 0.3s ease-in;
+    overflow-y: scroll;
+}
+
+.comment-display.open {
+    left: 0%
+}
+
+.comment-area {
+    display: block;
+    font-family: regular;
+    width: 100% !important;
+    resize: vertical;
+    margin-bottom: 20px !important;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.comment-name {
+    display: block;
+    font-family: regular;
+    width: 100% !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #ccc;
+    padding: 5px;
 }
 
 /* Landscape layout (with min-width) */
