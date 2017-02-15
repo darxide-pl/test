@@ -3,12 +3,12 @@
     <feature name="Device">
         <param name="browser-package" value="Device" />
     </feature>
-    <name>Hello World</name>
+    <name>Baza leków</name>
     <description>
-        Hello World sample application that responds to the deviceready event.
+        Baza leków.
     </description>
-    <author email="support@phonegap.com" href="http://phonegap.com">
-        PhoneGap Team
+    <author email="_@t.pl" href="http://www.dariuszm.pl">
+        Dariusz Majchrzak
     </author>
     <content src="index.html" />
     <access origin="*" />
